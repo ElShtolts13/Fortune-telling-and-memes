@@ -34,12 +34,12 @@ class MemsViewController: UIViewController {
         
         backgroundImage.image = UIImage(named: "background1")
         backgroundImage.contentMode = .scaleAspectFit
-        glass.tintColor = .gray
+        glass.tintColor = .skyBlue
         glass.translatesAutoresizingMaskIntoConstraints = false
         
-        questionTextField.placeholder = "Задайте свой вопрос..."
+        questionTextField.placeholder = "🌝 Задай свой вопрос..."
         questionTextField.borderStyle = .roundedRect
-        questionTextField.backgroundColor = .lightText
+        questionTextField.backgroundColor = .graySky
 
         questionTextField.translatesAutoresizingMaskIntoConstraints = false
         
@@ -48,8 +48,8 @@ class MemsViewController: UIViewController {
         questionTextField.layer.cornerRadius = 10
         questionTextField.clipsToBounds = true
         
-        predictButton.setTitle("Получить предсказание", for: .normal)
-        predictButton.backgroundColor = .gray
+        predictButton.setTitle("✨Получить предсказание✨", for: .normal)
+        predictButton.backgroundColor = .skyBlue
         predictButton.layer.cornerRadius = 10
         predictButton.translatesAutoresizingMaskIntoConstraints = false
         predictButton.addTarget(self, action: #selector(predictButtonPressed), for: .touchUpInside)
@@ -108,9 +108,9 @@ class MemsViewController: UIViewController {
             glass.trailingAnchor.constraint(equalTo: iconContainer.trailingAnchor, constant: -8),
             glass.centerYAnchor.constraint(equalTo: iconContainer.centerYAnchor),
             
-            questionTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            questionTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            questionTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            questionTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
+            questionTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            questionTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
             questionTextField.heightAnchor.constraint(equalToConstant: 50),
             
             
