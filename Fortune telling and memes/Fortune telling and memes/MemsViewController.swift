@@ -10,7 +10,7 @@ import UIKit
 class MemsViewController: UIViewController {
     
     // MARK: - UI elements
-    
+    private let backgroundImage = UIImageView(frame: UIScreen.main.bounds)
     private let questionTextField = UITextField()
     private let predictButton = UIButton()
     private let memeImageView = UIImageView()
@@ -31,9 +31,9 @@ class MemsViewController: UIViewController {
 
     // MARK: - Setup Methods
     private func setupUI() {
-        view.backgroundColor = .white
         
-
+        backgroundImage.image = UIImage(named: "background1")
+        backgroundImage.contentMode = .scaleAspectFit
         glass.tintColor = .gray
         glass.translatesAutoresizingMaskIntoConstraints = false
         
@@ -57,7 +57,7 @@ class MemsViewController: UIViewController {
         memeImageView.contentMode = .scaleAspectFit
         memeImageView.translatesAutoresizingMaskIntoConstraints = false
         memeImageView.image = UIImage(named: "demo_meme")
-        memeImageView.isHidden = false
+        memeImageView.isHidden = true
         memeImageView.layer.masksToBounds = true
         
         memeImageView.layer.cornerRadius = 40
@@ -66,6 +66,7 @@ class MemsViewController: UIViewController {
         
         configureReactionButtons()
         
+        view.addSubview(backgroundImage)
         view.addSubview(questionTextField)
         view.addSubview(predictButton)
         view.addSubview(memeImageView)
@@ -81,7 +82,7 @@ class MemsViewController: UIViewController {
         buttonsStackView.spacing = 20
         buttonsStackView.distribution = .fillEqually
         buttonsStackView.translatesAutoresizingMaskIntoConstraints = false
-        buttonsStackView.isHidden = false
+        buttonsStackView.isHidden = true
         
         [("👍", #selector(savePrediction), UIColor.green), ("👎", #selector(loadNewMeme), UIColor.red)].forEach {
             let button = UIButton()
@@ -97,6 +98,11 @@ class MemsViewController: UIViewController {
     }
     private func setupConstraints() {
         NSLayoutConstraint.activate([
+            
+            backgroundImage.topAnchor.constraint(equalTo: view.topAnchor),
+            backgroundImage.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            backgroundImage.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            backgroundImage.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
             glass.leadingAnchor.constraint(equalTo: iconContainer.leadingAnchor, constant: 8),
             glass.trailingAnchor.constraint(equalTo: iconContainer.trailingAnchor, constant: -8),
