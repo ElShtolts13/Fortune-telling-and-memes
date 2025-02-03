@@ -37,9 +37,13 @@ class MemsViewController: UIViewController {
         glass.tintColor = .skyBlue
         glass.translatesAutoresizingMaskIntoConstraints = false
         
-        questionTextField.placeholder = "🌝 Задай свой вопрос..."
+        questionTextField.setPlaceholder(
+            color: .white,
+            text: "🧸 Задай свой вопрос....",
+            font: .systemFont(ofSize: 18)
+        )
         questionTextField.borderStyle = .roundedRect
-        questionTextField.backgroundColor = .graySky
+        questionTextField.backgroundColor = .sunny
 
         questionTextField.translatesAutoresizingMaskIntoConstraints = false
         
