@@ -47,22 +47,61 @@ final class APIManager {
         
         if let cachedImage = casheImage.object(forKey: urlString as NSString) {
             completion(cachedImage)
+            print("✅ Используем кешированное изображение: \(urlString)")
             return
         }
         
         guard let url = URL(string: urlString) else {
+            print("⚠️ Некорректный URL: \(urlString)")
             completion(nil)
             return
         }
         
-        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
-            guard let data = data, let image = UIImage(data: data) else {
+        // Настройка запроса
+        let request = URLRequest(
+            url: url,
+            cachePolicy: .returnCacheDataElseLoad,
+            timeoutInterval: 15
+        )
+        
+        print("🌐 Начинаем загрузку: \(urlString)")
+        
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            // Обработка ошибок
+            if let error = error {
+                print("❗️ Ошибка загрузки: \(error.localizedDescription)")
                 completion(nil)
                 return
             }
             
+            // Проверка статус кода
+            guard let httpResponse = response as? HTTPURLResponse,
+                  (200...299).contains(httpResponse.statusCode) else {
+                print("❗️ Некорректный статус код: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+                completion(nil)
+                return
+            }
+            
+            // Преобразование данных
+            guard let data = data, !data.isEmpty else {
+                print("❗️ Получены пустые данные")
+                completion(nil)
+                return
+            }
+            
+            // Декодирование изображения
+            guard let image = UIImage(data: data) else {
+                print("❗️ Не удалось создать изображение из данных")
+                completion(nil)
+                return
+            }
+            
+            // Кеширование
             self?.casheImage.setObject(image, forKey: urlString as NSString)
+            print("✅ Успешно загружено: \(urlString)")
+            
             completion(image)
+            
         }.resume()
     }
 

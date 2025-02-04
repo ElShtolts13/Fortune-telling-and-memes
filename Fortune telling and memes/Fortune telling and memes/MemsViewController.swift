@@ -31,7 +31,7 @@ class MemsViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
-        loadNewMeme()
+        loadMemes()
     }
 
     // MARK: - Setup Methods
@@ -180,14 +180,33 @@ class MemsViewController: UIViewController {
         guard let meme = memes.randomElement() else { return }
         currentMeme = meme
         
+        // Показываем индикатор загрузки
+        memeImageView.image = nil
+        memeImageView.isHidden = false
+        
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        memeImageView.addSubview(activityIndicator)
+        
+        activityIndicator.center = CGPoint(x: memeImageView.bounds.midX, y: memeImageView.bounds.midY)
+        activityIndicator.startAnimating()
+        
         apiManager.loadImage(from: meme.url) { [weak self] image in
             DispatchQueue.main.async {
-                self?.memeImageView.isHidden = false
+                
+                activityIndicator.stopAnimating()
+                activityIndicator.removeFromSuperview()
+                
+                
+                if let image = image {
                 self?.memeImageView.image = image
+                self?.animatedImageAppearance()
             }
+                else {
+                    self?.showImageLoadError()
+                }
         }
     }
-    
+    }
     private func showError(_ error: Error) {
         let alert = UIAlertController(
             title: "Error",
@@ -196,6 +215,12 @@ class MemsViewController: UIViewController {
         )
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
+        
+    }
+    private func animatedImageAppearance(){
+        
+    }
+    private func showImageLoadError() {
         
     }
 }
