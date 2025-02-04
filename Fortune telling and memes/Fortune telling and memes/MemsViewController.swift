@@ -21,12 +21,17 @@ class MemsViewController: UIViewController {
     let iconContainer = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
     let glass = UIImageView(image: UIImage(systemName: "magnifyingglass"))
 
+    // MARK: - Properties
+    private let apiManager = APIManager.shared
+    private var memes: [Meme] = []
+    private var currentMeme: Meme?
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
+        loadNewMeme()
     }
 
     // MARK: - Setup Methods
@@ -60,7 +65,6 @@ class MemsViewController: UIViewController {
         
         memeImageView.contentMode = .scaleAspectFit
         memeImageView.translatesAutoresizingMaskIntoConstraints = false
-        memeImageView.image = UIImage(named: "demo_meme")
         memeImageView.isHidden = true
         memeImageView.layer.masksToBounds = true
         
@@ -117,19 +121,16 @@ class MemsViewController: UIViewController {
             questionTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
             questionTextField.heightAnchor.constraint(equalToConstant: 50),
             
-            
             predictButton.topAnchor.constraint(equalTo: questionTextField.bottomAnchor, constant: 20),
             predictButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
             predictButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             predictButton.heightAnchor.constraint(equalToConstant: 44),
-            
             
             memeImageView.topAnchor.constraint(equalTo: predictButton.bottomAnchor, constant: 10),
             memeImageView.leadingAnchor.constraint(equalTo: predictButton.leadingAnchor),
             memeImageView.trailingAnchor.constraint(equalTo: predictButton.trailingAnchor),
             memeImageView.heightAnchor.constraint(equalToConstant: 300),
             
-           
             buttonsStackView.topAnchor.constraint(equalTo: memeImageView.bottomAnchor, constant: 10),
             buttonsStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             buttonsStackView.widthAnchor.constraint(equalToConstant: 200),
@@ -137,18 +138,64 @@ class MemsViewController: UIViewController {
         ])
     }
     
+    // MARK: - Network
+    private func loadMemes() {
+        apiManager.fetchMemes { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let memes):
+                    self?.memes = memes
+                case .failure(let error):
+                   self?.showError(error)
+                }
+            }
+        }
+    }
     // MARK: - Actions
     @objc func predictButtonPressed() {
         guard !(questionTextField.text?.isReallyEmpty ?? true) else { return }
-        memeImageView.image = UIImage(named: "demo_meme")
-        memeImageView.isHidden = false
+        
+        showRandomMeme()
         buttonsStackView.isHidden = false
         backgroundImage.image = UIImage(named: "backgroundFin")
     }
+    
     @objc func savePrediction() {
+        let alert = UIAlertController(
+            title: "Saved",
+            message: "Prediction was saved",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
         
     }
+    
     @objc func loadNewMeme() {
+        showRandomMeme()
+    }
+    // MARK: - Helpers
+    
+    private func showRandomMeme() {
+        guard let meme = memes.randomElement() else { return }
+        currentMeme = meme
+        
+        apiManager.loadImage(from: meme.url) { [weak self] image in
+            DispatchQueue.main.async {
+                self?.memeImageView.isHidden = false
+                self?.memeImageView.image = image
+            }
+        }
+    }
+    
+    private func showError(_ error: Error) {
+        let alert = UIAlertController(
+            title: "Error",
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
         
     }
 }

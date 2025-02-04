@@ -44,7 +44,8 @@ final class APIManager {
     }
     
     func loadImage(from urlString: String, completion: @escaping (UIImage?) -> Void) {
-        if let cachedImage = imageCache.object(forKey: urlString as NSString) {
+        
+        if let cachedImage = casheImage.object(forKey: urlString as NSString) {
             completion(cachedImage)
             return
         }
@@ -60,7 +61,7 @@ final class APIManager {
                 return
             }
             
-            self?.imageCache.setObject(image, forKey: urlString as NSString)
+            self?.casheImage.setObject(image, forKey: urlString as NSString)
             completion(image)
         }.resume()
     }
