@@ -88,7 +88,7 @@ class MemsViewController: UIViewController {
         buttonsStackView.translatesAutoresizingMaskIntoConstraints = false
         buttonsStackView.isHidden = true
         
-        [("👍", #selector(savePrediction), UIColor.green), ("👎", #selector(loadNewMeme), UIColor.red)].forEach {
+        [("❤️", #selector(savePrediction), UIColor.goodGreen), ("💔", #selector(loadNewMeme), UIColor.badRed)].forEach {
             let button = UIButton()
             button.backgroundColor = $0.2
             button.setTitle($0.0, for: .normal)
@@ -125,8 +125,8 @@ class MemsViewController: UIViewController {
             
             
             memeImageView.topAnchor.constraint(equalTo: predictButton.bottomAnchor, constant: 10),
-            memeImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            memeImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            memeImageView.leadingAnchor.constraint(equalTo: predictButton.leadingAnchor),
+            memeImageView.trailingAnchor.constraint(equalTo: predictButton.trailingAnchor),
             memeImageView.heightAnchor.constraint(equalToConstant: 300),
             
            
@@ -143,17 +143,12 @@ class MemsViewController: UIViewController {
         memeImageView.image = UIImage(named: "demo_meme")
         memeImageView.isHidden = false
         buttonsStackView.isHidden = false
+        backgroundImage.image = UIImage(named: "backgroundFin")
     }
     @objc func savePrediction() {
         
     }
     @objc func loadNewMeme() {
         
-    }
-}
-
-extension String {
-    var isReallyEmpty: Bool {
-        return trimmingCharacters(in: .whitespaces).isEmpty
     }
 }
