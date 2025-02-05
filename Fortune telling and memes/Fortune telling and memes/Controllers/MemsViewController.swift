@@ -63,7 +63,7 @@ class MemsViewController: UIViewController {
         predictButton.translatesAutoresizingMaskIntoConstraints = false
         predictButton.addTarget(self, action: #selector(predictButtonPressed), for: .touchUpInside)
         
-        memeImageView.contentMode = .scaleAspectFit
+        memeImageView.contentMode = .scaleAspectFill
         memeImageView.translatesAutoresizingMaskIntoConstraints = false
         memeImageView.isHidden = true
         memeImageView.layer.masksToBounds = true
@@ -80,9 +80,6 @@ class MemsViewController: UIViewController {
         view.addSubview(memeImageView)
         view.addSubview(buttonsStackView)
         iconContainer.addSubview(glass)
-
-       
-        
     }
     
     func configureReactionButtons() {
@@ -105,13 +102,15 @@ class MemsViewController: UIViewController {
         
     }
     private func setupConstraints() {
+        backgroundImage.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             
             backgroundImage.topAnchor.constraint(equalTo: view.topAnchor),
             backgroundImage.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             backgroundImage.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             backgroundImage.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            
+
             glass.leadingAnchor.constraint(equalTo: iconContainer.leadingAnchor, constant: 8),
             glass.trailingAnchor.constraint(equalTo: iconContainer.trailingAnchor, constant: -8),
             glass.centerYAnchor.constraint(equalTo: iconContainer.centerYAnchor),
@@ -161,14 +160,23 @@ class MemsViewController: UIViewController {
     }
     
     @objc func savePrediction() {
+        guard let question = questionTextField.text,
+        let meme = currentMeme else { return }
+
+        let prediction = Prediction(
+            quiestion: question,
+            memeURL: meme.url,
+            date: Date()
+        )
+        StorageManager.shared.save(prediction: prediction)
+        
         let alert = UIAlertController(
-            title: "Saved",
-            message: "Prediction was saved",
+            title: "Сохранено!",
+            message: "Ваше предсказание сохранено",
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
-        
     }
     
     @objc func loadNewMeme() {
@@ -218,9 +226,19 @@ class MemsViewController: UIViewController {
         
     }
     private func animatedImageAppearance(){
-        
+        memeImageView.alpha = 0
+        UIView.animate(withDuration: 0.5) {
+            self.memeImageView.alpha = 1
+        }
     }
     private func showImageLoadError() {
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: "Не удалось загрузить мем",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
         
     }
 }
