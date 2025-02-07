@@ -26,7 +26,7 @@ class StorageManager {
          return predictions
      }
 
-    func delite(at index: Int) {
+    func delete(at index: Int) {
         var predictions = loadAll()
         predictions.remove(at: index)
         if let data = try? JSONEncoder().encode(predictions) {

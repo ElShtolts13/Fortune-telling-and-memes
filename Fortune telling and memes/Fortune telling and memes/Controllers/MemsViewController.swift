@@ -17,6 +17,8 @@ class MemsViewController: UIViewController {
     private let buttonsStackView = UIStackView()
     private let acceptButton = UIButton()
     private let rejectButton = UIButton()
+    private let savedButton = UIButton()
+    private let questionLabel = UILabel()
     
     let iconContainer = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
     let glass = UIImageView(image: UIImage(systemName: "magnifyingglass"))
@@ -63,15 +65,37 @@ class MemsViewController: UIViewController {
         predictButton.translatesAutoresizingMaskIntoConstraints = false
         predictButton.addTarget(self, action: #selector(predictButtonPressed), for: .touchUpInside)
         
-        memeImageView.contentMode = .scaleAspectFill
+        questionLabel.textAlignment = .center
+        questionLabel.isHidden = true
+        questionLabel.textColor = .badRed
+        questionLabel.numberOfLines = 0
+        questionLabel.translatesAutoresizingMaskIntoConstraints = false
+        questionLabel.text = ""
+        questionLabel.font = .systemFont(ofSize: 20, weight: .medium)
+        questionLabel.adjustsFontSizeToFitWidth = true
+        questionLabel.minimumScaleFactor = 0.5
+        questionLabel.lineBreakMode = .byWordWrapping
+        
+        questionTextField.autocapitalizationType = .sentences
+        questionTextField.autocorrectionType = .yes
+        questionTextField.returnKeyType = .done
+        questionTextField.delegate = self
+        
+        
+        memeImageView.contentMode = .scaleAspectFit
         memeImageView.translatesAutoresizingMaskIntoConstraints = false
         memeImageView.isHidden = true
         memeImageView.layer.masksToBounds = true
         
-        memeImageView.layer.cornerRadius = 40
+        memeImageView.layer.cornerRadius = 30
         memeImageView.layer.masksToBounds = true
         memeImageView.clipsToBounds = true
         
+        savedButton.setImage(UIImage(systemName: "bookmark.fill"), for: .normal)
+        savedButton.tintColor = .orange
+        savedButton.layer.cornerRadius = 10
+        savedButton.translatesAutoresizingMaskIntoConstraints = false
+        savedButton.addTarget(self, action: #selector(savedButtonPressed), for: .touchUpInside)
         configureReactionButtons()
         
         view.addSubview(backgroundImage)
@@ -79,6 +103,8 @@ class MemsViewController: UIViewController {
         view.addSubview(predictButton)
         view.addSubview(memeImageView)
         view.addSubview(buttonsStackView)
+        view.addSubview(savedButton)
+        view.addSubview(questionLabel)
         iconContainer.addSubview(glass)
     }
     
@@ -91,7 +117,7 @@ class MemsViewController: UIViewController {
         
         [("❤️", #selector(savePrediction), UIColor.goodGreen), ("💔", #selector(loadNewMeme), UIColor.badRed)].forEach {
             let button = UIButton()
-            button.backgroundColor = $0.2
+            //button.backgroundColor = $0.2
             button.setTitle($0.0, for: .normal)
             button.titleLabel?.font = .systemFont(ofSize: 40)
             button.layer.cornerRadius = 10
@@ -125,15 +151,24 @@ class MemsViewController: UIViewController {
             predictButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             predictButton.heightAnchor.constraint(equalToConstant: 44),
             
-            memeImageView.topAnchor.constraint(equalTo: predictButton.bottomAnchor, constant: 10),
-            memeImageView.leadingAnchor.constraint(equalTo: predictButton.leadingAnchor),
-            memeImageView.trailingAnchor.constraint(equalTo: predictButton.trailingAnchor),
-            memeImageView.heightAnchor.constraint(equalToConstant: 300),
+            questionLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            questionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            questionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            buttonsStackView.topAnchor.constraint(equalTo: memeImageView.bottomAnchor, constant: 10),
+            memeImageView.topAnchor.constraint(equalTo: questionLabel.bottomAnchor, constant: 5),
+            memeImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            memeImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            memeImageView.bottomAnchor.constraint(lessThanOrEqualTo: buttonsStackView.topAnchor, constant: -10),
+            
+            buttonsStackView.bottomAnchor.constraint(equalTo: savedButton.topAnchor, constant: -45),
             buttonsStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             buttonsStackView.widthAnchor.constraint(equalToConstant: 200),
-            buttonsStackView.heightAnchor.constraint(equalToConstant: 50)
+            buttonsStackView.heightAnchor.constraint(equalToConstant: 50),
+            
+            savedButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            savedButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            savedButton.heightAnchor.constraint(equalToConstant: 50),
+            savedButton.widthAnchor.constraint(equalToConstant: 50)
         ])
     }
     
@@ -152,14 +187,21 @@ class MemsViewController: UIViewController {
     }
     // MARK: - Actions
     @objc func predictButtonPressed() {
-        guard !(questionTextField.text?.isReallyEmpty ?? true) else { return }
+        guard let question = questionTextField.text, !question.isEmpty else {
+            showError( "Пожалуйста, введите вопрос" as! Error)
+            return
+        }
         
+        questionTextField.isHidden = true
+        questionLabel.text = "Ваш вопрос: \(question)"
+        questionLabel.isHidden = false
         showRandomMeme()
         buttonsStackView.isHidden = false
         backgroundImage.image = UIImage(named: "backgroundFin")
     }
     
     @objc func savePrediction() {
+        
         guard let question = questionTextField.text,
         let meme = currentMeme else { return }
 
@@ -182,12 +224,17 @@ class MemsViewController: UIViewController {
     @objc func loadNewMeme() {
         showRandomMeme()
     }
+    @objc func savedButtonPressed() {
+        let historyVC = HistoryViewController()
+        navigationController?.pushViewController(historyVC, animated: true)
+        
+    }
     // MARK: - Helpers
     
     private func showRandomMeme() {
         guard let meme = memes.randomElement() else { return }
         currentMeme = meme
-        
+        predictButton.isHidden = true
         // Показываем индикатор загрузки
         memeImageView.image = nil
         memeImageView.isHidden = false
@@ -240,5 +287,12 @@ class MemsViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
         
+    }
+}
+
+extension MemsViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
