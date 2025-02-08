@@ -14,8 +14,8 @@
             filePath = "Fortune telling and memes/Controllers/MemsViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "116"
-            endingLineNumber = "116"
+            startingLineNumber = "112"
+            endingLineNumber = "112"
             landmarkName = "configureReactionButtons()"
             landmarkType = "7">
          </BreakpointContent>

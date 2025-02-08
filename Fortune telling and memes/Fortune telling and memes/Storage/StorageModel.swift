@@ -8,7 +8,7 @@
 import Foundation
 
 struct Prediction: Codable {
-    let quiestion: String
+    let question: String
     let memeURL: String
     let date: Date
 }
